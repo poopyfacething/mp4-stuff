@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poopy Player</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --background: #f9fafb;
+      --card-bg: #ffffff;
+      --card-hover: #f3f4f6;
+      --text-main: #111827;
+      --text-secondary: #6b7280;
+      --border-radius: 12px;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.6;
+
+      /* Hide scrollbar */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    h2 {
+      margin-bottom: 24px;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .search-bar {
+      margin-bottom: 32px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: var(--border-radius);
+      border: 1px solid #d1d5db;
+      background: #fff;
+      transition: border 0.2s;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .section {
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 48px;
+    }
+
+    .section h3 {
+      margin-bottom: 16px;
+      font-size: 1.25rem;
+      font-weight: 500;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 6px;
+      color: var(--primary-color);
+    }
+
+    .list-container {
+      max-height: 220px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      transition: scroll 0.7s ease-in-out;
+
+      /* Hide scrollbar */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .list-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    li:hover {
+      background: var(--card-hover);
+      transform: translateY(-1px);
+    }
+
+    .duration {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    audio {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .controls input[type="number"] {
+      width: 100px;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+    }
+
+    .controls button {
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background-color 0.25s;
+    }
+
+    .controls button:hover {
+      background-color: #1e40af;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Poopy Player</h2>
+
+  <div class="search-bar">
+    <input type="text" id="searchBar" placeholder="Search tracks..." />
+  </div>
+
+  <div class="section">
+    <h3>Videos</h3>
+    <div class="list-container">
+      <ul id="videoList"></ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Shorts</h3>
+    <div class="list-container">
+      <ul id="shortList"></ul>
+    </div>
+  </div>
+
+  <audio id="audioPlayer" controls>
+    Your browser does not support the audio element.
+  </audio>
+
+  <div class="controls">
+    <input type="number" id="startTime" placeholder="Start (s)" min="0" />
+    <input type="number" id="endTime" placeholder="End (s)" min="0" />
+    <button id="loopToggle">Loop: Off</button>
+  </div>
+
+  <script>
+    const videoList = document.getElementById("videoList");
+    const shortList = document.getElementById("shortList");
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    const tracks = [
+      { title: "Human", url: "https://yeahboy-one.vercel.app/human.mp4" },
+      { title: "Appbees", url: "https://mp4-stuff.vercel.app/shorts/videoplayback (1).mp4" },
+      { title: "Life Could Be a Dream", url: "https://mp4-stuff.vercel.app/video/videoplayback (17).mp4" },
+      { title: "Thunderstruck", url: "https://mp4-stuff.vercel.app/video/videoplayback (18).mp4" },
+      { title: "Pennies from Heaven", url: "https://mp4-stuff.vercel.app/video/videoplayback (11).mp4" },
+      { title: "Put Your Head on My Shoulder (Life in 3D)", url: "https://mp4-stuff.vercel.app/video/videoplayback (5).mp4" },
+      { title: "House in New Orleans", url: "https://mp4-stuff.vercel.app/video/videoplayback (7).mp4" },
+      { title: "I Think They Call This Love", url: "https://mp4-stuff.vercel.app/video/videoplayback (12).mp4" },
+      { title: "Che La Luna", url: "https://mp4-stuff.vercel.app/video/videoplayback (13).mp4" },
+      { title: "Dear Hearts and Gentle People", url: "https://mp4-stuff.vercel.app/video/videoplayback (15).mp4" },
+      { title: "Believer", url: "https://mp4-stuff.vercel.app/video/videoplayback (8).mp4" },
+      { title: "That's Amore", url: "https://mp4-stuff.vercel.app/video/videoplayback (16).mp4" },
+      { title: "Make 'Em Laugh", url: "https://mp4-stuff.vercel.app/video/videoplayback (9).mp4" },
+      { title: "I Love You Baby", url: "https://mp4-stuff.vercel.app/shorts/videoplayback (2).mp4" },
+      { title: "Too Sweet", url: "https://mp4-stuff.vercel.app/shorts/videoplayback (3).mp4" },
+      { title: "I Lose Control", url: "https://mp4-stuff.vercel.app/shorts/videoplayback (4).mp4" },
+      { title: "Put Your Head on My Shoulder", url: "https://mp4-stuff.vercel.app/video/videoplayback (6).mp4" },
+      { title: "Noah", url: "https://mp4-stuff.vercel.app/video/videoplayback (14).mp4" },
+      { title: "Angelina", url: "https://mp4-stuff.vercel.app/video/videoplayback (10).mp4" }
+    ];
+
+    const isShort = (url) => url.includes("/shorts/");
+    const createListItem = (track) => {
+      const li = document.createElement("li");
+      li.textContent = track.title;
+      li.addEventListener("click", () => {
+        audioPlayer.src = track.url;
+        audioPlayer.play();
+      });
+      return li;
+    };
+
+    tracks.forEach(track => {
+      const li = createListItem(track);
+      if (isShort(track.url)) {
+        shortList.appendChild(li);
+      } else {
+        videoList.appendChild(li);
+      }
+    });
+
+    const loopToggle = document.getElementById("loopToggle");
+    loopToggle.addEventListener("click", () => {
+      audioPlayer.loop = !audioPlayer.loop;
+      loopToggle.textContent = `Loop: ${audioPlayer.loop ? "On" : "Off"}`;
+    });
+  </script>
+</body>
+
+</html>
