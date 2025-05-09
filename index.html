@@ -204,6 +204,7 @@
     const videoList = document.getElementById("videoList");
     const shortList = document.getElementById("shortList");
     const audioPlayer = document.getElementById("audioPlayer");
+    const searchBar = document.getElementById("searchBar");
 
     const tracks = [
       { title: "Human", url: "https://yeahboy-one.vercel.app/human.mp4" },
@@ -238,13 +239,26 @@
       return li;
     };
 
-    tracks.forEach(track => {
-      const li = createListItem(track);
-      if (isShort(track.url)) {
-        shortList.appendChild(li);
-      } else {
-        videoList.appendChild(li);
-      }
+    const displayTracks = (filter = "") => {
+      videoList.innerHTML = "";
+      shortList.innerHTML = "";
+
+      tracks.forEach(track => {
+        if (track.title.toLowerCase().includes(filter.toLowerCase())) {
+          const li = createListItem(track);
+          if (isShort(track.url)) {
+            shortList.appendChild(li);
+          } else {
+            videoList.appendChild(li);
+          }
+        }
+      });
+    };
+
+    displayTracks();
+
+    searchBar.addEventListener("input", (e) => {
+      displayTracks(e.target.value);
     });
 
     const loopToggle = document.getElementById("loopToggle");
